@@ -1,0 +1,45 @@
+   <div data-ng-controller="OrdersController">
+      <div id="add_new_order">
+        <h2>Add a new order</h2>
+        <p data-ng-bind="errors"></p>
+        <div>
+          <label>Customer</label>
+          <select data-ng-model="newOrder.customer" data-ng-options="customer.name for customer in customers">
+            <option value="placeholder">placeholder</option>
+          </select>
+        </div>
+        <div id="order">
+          <label>Order</label>
+          <select data-ng-model="newOrder.quantity">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+          <select data-ng-model="newOrder.product" data-ng-options="product for product in products">
+            <option value="placeholder">placeholder</option>
+          </select>
+        </div>
+        <button data-ng-click="addOrder()">Order</button>
+      </div>
+      <div id="existing_customers">
+        <input type="text" placeholder="search name..." data-ng-model="filter.name">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer Name</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-ng-repeat="order in orders | filter:filter.name | orderBy:'+created_at'">
+              <td data-ng-bind="order.customerName"></td>
+              <td data-ng-bind="order.product"></td>
+              <td data-ng-bind="order.quantity"></td>
+              <td data-ng-bind="order.created_at | date:'yyyy-MM-dd HH:mm:ss'"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>

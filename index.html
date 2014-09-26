@@ -7,36 +7,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.min.js"></script>
   </head>
   <body data-ng-app="myApp">
-    <div data-ng-controller="CustomersController">
-      <div id="add_new_customer">
-        <h2>Add a new customer</h2>
-        <label for="name">Customer Name:</label>
-        <input type="text" name="name" id="name" data-ng-model="newCustomer.name">
-        <button data-ng-click="addCustomer()">Add</button>
-      </div>
-      <p>{{ errors }}</p>
-      <div id="existing_customers">
-        <input type="text" placeholder="search name..." data-ng-model="filter.name">
-        <table>
-          <thead>
-            <tr>
-              <th>Customer Name</th>
-              <th>Created Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr data-ng-repeat="customer in customers | filter:filter.name | orderBy:'+created_at'">
-              <td data-ng-bind="customer.name"></td>
-              <td data-ng-bind="customer.created_at | date:'yyyy-MM-dd HH:mm:ss'"></td>
-              <td><button data-ng-click="removeCustomer($index)">Remove</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <a href="#/">Customers</a> | <a href="#/orders">Orders</a>
+    <div data-ng-view="">
     </div>
     <script>
       var myApp = angular.module('myApp', ['ngRoute']);
+
+      myApp.config(function($routeProvider) {
+        $routeProvider
+        .when('/', {templateUrl: 'partials/customers.html'})
+        .when('/orders', {templateUrl: 'partials/orders.html'})
+      });
 
       myApp.controller('CustomersController', function($scope, customerFactory){
         $scope.errors = "";
@@ -45,6 +26,49 @@
                                $scope.errors = customerFactory.addCustomer($scope.newCustomer.name);
                              }
         $scope.removeCustomer = function($index){ customerFactory.removeCustomer($index); };
+      });
+
+      myApp.controller('OrdersController', function($scope, customerFactory, productFactory, orderFactory){
+        $scope.errors = ""
+        $scope.customers = customerFactory.getCustomers();
+        $scope.orders = orderFactory.getOrders();
+        $scope.products = productFactory.getProducts();
+        $scope.addOrder = function() {
+                            $scope.errors = orderFactory.addOrder($scope.newOrder);
+                         }
+      });
+
+      myApp.factory('orderFactory', function(){
+        var orders = [];
+        var factory = {};
+
+        factory.getOrders = function() {
+          return orders;
+        }
+
+        factory.addOrder = function(newOrder){
+          var current_date = new Date();
+          var new_order = {}
+
+          if(newOrder == undefined || newOrder.customerName == '' || newOrder.product == '' || newOrder.quantity == '') {
+            return "All fields are required";
+          }
+
+          new_order.customerName = newOrder.customer.name;
+          new_order.quantity = newOrder.quantity;
+          new_order.product = newOrder.product;
+          new_order.created_at = new Date();
+          orders.push(new_order);
+        }
+        return factory;
+      });
+      myApp.factory('productFactory', function(){
+        var products = ['Shoe', 'Hat', 'Shirt'];
+        var factory = {};
+        factory.getProducts = function(){
+          return products;
+        }
+        return factory;
       });
 
       myApp.factory('customerFactory', function(){
